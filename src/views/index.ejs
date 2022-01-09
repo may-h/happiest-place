@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Happiest Place☺</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script type="text/javascript">
+        function getGps() {
+
+            // 업로드 파일 읽기
+            const files = document.getElementById("files").files;
+            // console.log(files)
+
+            const fileInfo = document.getElementById( "files" ).files[0];
+
+            for(let file of files) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    EXIF.getData(fileInfo, () => {
+                        const tags = EXIF.getAllTags(fileInfo);
+                        console.log(tags);
+                        document.getElementById('lat').value = `${tags.GPSLatitudeRef}/${tags.GPSLatitude}`;
+                        document.getElementById('lng').value = `${tags.GPSLongitudeRef}/${tags.GPSLongitude}`;
+                        document.getElementById('dateTime').value = tags.DateTime;
+                    })
+                }
+                // readAsDataURL( )을 통해 파일의 URL을 읽어온다.
+                reader.readAsDataURL(file)
+            }
+        }
+    </script>
+</head>
+<body>
+<h1><%= title %></h1>
+<p>UPLOAD PHOTO</p>
+
+<form method="post" action="/emotionApi" enctype="multipart/form-data">
+    <div>
+        <!--        file : <input type="file" name="file" id="file" accept="image/*" onChange="getGps();" >-->
+        <br> <input type="file" multiple="multiple" data-maxfile="1024" maxlength="5" name="files" id="files" accept="image/*" onChange="getGps();" >
+    </div>
+
+    <input type="submit">
+</form>
+</body>
+</html>
