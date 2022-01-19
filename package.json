@@ -4,6 +4,10 @@
   "description": "",
   "author": "",
   "private": true,
+  "engines": {
+    "node": "14.x",
+    "npm": "7.x"
+  },
   "license": "UNLICENSED",
   "scripts": {
     "prestart:prod": "rimraf dist && npm run build",
