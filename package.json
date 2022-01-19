@@ -27,6 +27,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@nestjs/cli": "^8.1.6",
     "@azure/cognitiveservices-face": "^5.0.0",
     "@azure/ms-rest-js": "^2.6.0",
     "@azure/storage-blob": "^12.8.0",
