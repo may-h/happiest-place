@@ -1,6 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {AnalysisGroupRepository} from "./analysisGroup.repository";
+// import {AnalysisGroupRepository} from "./analysisGroup.repository";
 import {ConfigService} from "@nestjs/config";
 import * as exif from 'exif-parser';
 import  { BlobServiceClient, StorageSharedKeyCredential, BlobSASPermissions, generateBlobSASQueryParameters } from '@azure/storage-blob';
@@ -22,8 +22,8 @@ export class EmotionService {
     private FACE_API_CLIENT;
 
     constructor(
-        @InjectRepository(AnalysisGroupRepository)
-        private analysisGroupRepository: AnalysisGroupRepository,
+        // @InjectRepository(AnalysisGroupRepository)
+        // private analysisGroupRepository: AnalysisGroupRepository,
         private readonly config: ConfigService
     ) {
         // storage
