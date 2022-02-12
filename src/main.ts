@@ -11,6 +11,8 @@ async function bootstrap() {
   app.setBaseViewsDir(resolve('./src/views'));
   app.setViewEngine('ejs');
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000, () => {
+    console.log(`server listening on port ${process.env.PORT || 3000}`);
+  });
 }
 bootstrap();
