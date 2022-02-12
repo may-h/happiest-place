@@ -27,8 +27,6 @@ import {EmotionModule} from "./modules/emotion/emotion.module";
       entities: [__dirname + '/../**/*.entity.{js,ts}'],
       synchronize: true,
       ssl: {
-        // ca: fs.readFileSync('/etc/ssl/cert.pem').toString(),
-        // rejectUnauthorized: false
         require: true,
         rejectUnauthorized: false
       }
