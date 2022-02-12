@@ -27,10 +27,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/cli": "^8.1.6",
     "@azure/cognitiveservices-face": "^5.0.0",
     "@azure/ms-rest-js": "^2.6.0",
     "@azure/storage-blob": "^12.8.0",
+    "@nestjs/cli": "^8.1.6",
     "@nestjs/common": "^8.2.4",
     "@nestjs/config": "^1.1.6",
     "@nestjs/core": "^8.2.4",
@@ -40,7 +40,8 @@
     "config": "^3.3.6",
     "ejs": "^3.1.6",
     "exif-parser": "^0.1.12",
-    "mysql2": "^2.3.3",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.5.1",

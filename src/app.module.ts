@@ -18,17 +18,19 @@ import {EmotionModule} from "./modules/emotion/emotion.module";
       load: [databaseConfig]
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.DATABASE_HOST,
       port: Number(process.env.DATABASE_PORT) || 3306,
       username: process.env.USERNAME,
       password: process.env.PASSWORD,
       database: process.env.DATABASE,
       entities: [__dirname + '/../**/*.entity.{js,ts}'],
-      synchronize: false,
+      synchronize: true,
       ssl: {
-        ca: fs.readFileSync('/etc/ssl/cert.pem').toString(),
+        // ca: fs.readFileSync('/etc/ssl/cert.pem').toString(),
         // rejectUnauthorized: false
+        require: true,
+        rejectUnauthorized: false
       }
     }),
     UsersModule,

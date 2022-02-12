@@ -138,14 +138,14 @@ export class EmotionService {
                 this.getGps(file),
                 this.uploadBlob(file, 'abcd'),
                 this.getAvgHappinessRate(await this.getEmotion(await this.getUrl('abcd')))
-            ]).then(values => ({gps: values[0], url: values[1], happiness: values[2]}));
+            ]).then(values => ({gps: values[0], url: values[1], happines: values[2]}));
 
             result.push(res);
         }
          console.timeEnd('promise')
 
 
-        return result;
+        return result
     }
 
 }
