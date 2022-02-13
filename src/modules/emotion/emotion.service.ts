@@ -77,7 +77,8 @@ export class EmotionService {
             // return {blobName, result};
             return await this.getUrl(blobName);
         } catch (err) {
-            return ({ message: err.message });
+            console.error(err);
+            throw new Error(err)
         }
     }
 
@@ -98,17 +99,27 @@ export class EmotionService {
         return `${containerClient.getBlockBlobClient(name).url}?${sasToken}`;
     }
 
-    async getEmotion(url) {
-        let detected_faces = await this.FACE_API_CLIENT.face.detectWithUrl(url,
-            {
-                // returnFaceAttributes: ["Accessories","Age","Blur","Emotion","Exposure","FacialHair","Gender","Glasses","Hair","HeadPose","Makeup","Noise","Occlusion","Smile"],
-                returnFaceAttributes: ["Emotion","Smile"],
-                detectionModel: "detection_01"
-            });
+    async getEmotion(file) {
+        // console.log(`url -> ${url}`);
+        let detected_faces = await this.FACE_API_CLIENT.face.detectWithStream(file.buffer, {
+            // returnFaceAttributes: ["Accessories","Age","Blur","Emotion","Exposure","FacialHair","Gender","Glasses","Hair","HeadPose","Makeup","Noise","Occlusion","Smile"],
+            returnFaceAttributes: ["Emotion","Smile"],
+            detectionModel: "detection_01"
+        })
+        // let detected_faces = await this.FACE_API_CLIENT.face.detectWithUrl(url,
+        //     {
+        //         // returnFaceAttributes: ["Accessories","Age","Blur","Emotion","Exposure","FacialHair","Gender","Glasses","Hair","HeadPose","Makeup","Noise","Occlusion","Smile"],
+        //         returnFaceAttributes: ["Emotion","Smile"],
+        //         detectionModel: "detection_01"
+        //     });
         return detected_faces;
     }
 
     getAvgHappinessRate(emotionArr) {
+        console.log(emotionArr)
+        if(!emotionArr) {
+            return -1;
+        }
         // console.log(JSON.stringify(emotionArr, null, 4))
         const sum = emotionArr.reduce((a, b) => a.faceAttributes.emotion.happiness + b.faceAttributes.emotion.happiness);
         return (sum / emotionArr.length) || 0;
@@ -134,13 +145,13 @@ export class EmotionService {
          console.time('promise')
          let result = [];
         for await (const file of files) {
-            const res = await Promise.all([
-                this.getGps(file),
-                this.uploadBlob(file, 'abcd'),
-                this.getAvgHappinessRate(await this.getEmotion(await this.getUrl('abcd')))
-            ]).then(values => ({gps: values[0], url: values[1], happines: values[2]}));
-
-            result.push(res);
+            // const res = await Promise.all([
+            //     this.getGps(file),
+            //     this.uploadBlob(file, 'abcd'),
+            //     this.getAvgHappinessRate(await this.getEmotion(await this.getUrl('abcd')))
+            // ]).then(values => ({gps: values[0], url: values[1], happinesz: values[2]}));
+            //
+            // result.push(res);
         }
          console.timeEnd('promise')
 

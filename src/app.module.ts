@@ -5,11 +5,10 @@ import {ConfigModule} from "@nestjs/config";
 import databaseConfig from "../config/database.config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Connection} from "typeorm";
-import {User} from './entity/User.entity';
-import {typeORMConfig} from "../config/typeorm.config";
-import {UsersModule} from "./user/users.module";
-import * as fs from "fs";
 import {EmotionModule} from "./modules/emotion/emotion.module";
+import {UserModule} from "./modules/emotion/user.module";
+import {AnalysisModule} from "./modules/emotion/analysis.module";
+import {typeORMConfig} from "./configs/typeorm.config";
 
 @Module({
   imports: [
@@ -31,8 +30,9 @@ import {EmotionModule} from "./modules/emotion/emotion.module";
         rejectUnauthorized: false
       }
     }),
-    UsersModule,
-    EmotionModule
+    EmotionModule,
+    UserModule,
+    AnalysisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -41,7 +41,7 @@
 <!--<div id="content">Hello world!</div>-->
 <div id="gpsEmpthy">
     <h2> 📍위치를 찾을 수 없어요!</h2>
-    <li id="gpsEmpthyList"></li>
+    <div id="gpsEmpthyList" style="display: inline"></div>
 </div>
 <script>
     let map, popup, Popup;
@@ -55,16 +55,6 @@
             zoom: 3,
             center: uluru,
         });
-
-
-        const contentString = '<div class="overlaybox">' +
-            `    <div class="first" style="background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/thumb.png') no-repeat">` +
-            '        <div class="triangle text">1</div>' +
-            '        <div class="movietitle text">🌟행복지수 98.2🌟</div>' +
-            '    </div>'
-        '</div>';
-
-
 
         function getContentString(url, happiness, rank) {
             return `<div class="overlaybox">
@@ -96,13 +86,15 @@
                     shouldFocus: false,
                 });
             } else { // 없으면..
-                document.getElementById("gpsEmpthyList").add
-                document.getElementById("gpsEmpthyList").appendChild(document.createTextNode(`<li><div class="overlaybox">
-                 <div class="first" style="background-image: url('${photo.url}'); background-size: cover; background-repeat: no-repeat; background-position: center center;  ">
-                    <div class="triangle text">${idx+1}</div>
-                    <div class="movietitle text">🌟행복지수 ${photo.happiness}🌟</div></li>
-                   </div>
-            </div>`))
+                const list = document.querySelector('#gpsEmpthyList');
+                let div = document.createElement('div');
+                div.classList.add('overlaybox');
+                div.innerHTML = `<div class="first" style="background-image: url('${photo.url}'); background-size: cover; background-repeat: no-repeat; background-position: center center;  ">
+                            <div class="triangle text">${idx+1}</div>
+                            <div class="movietitle text">🌟행복지수 ${photo.happiness}🌟</div>
+                        </div>`;
+
+                list.appendChild(div);
             }
         })
     }

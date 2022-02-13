@@ -1,8 +1,7 @@
 import {BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique} from "typeorm";
-import {AnalysisGroup} from './AnalysisGroup.entity';
+import {Analysis} from './Analysis.entity';
 
 @Entity()
-@Unique(['filename'])
 export class Image extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
@@ -13,21 +12,20 @@ export class Image extends BaseEntity{
     @Column()
     orgFilename: string;
 
-    @Column()
+    @Column({ type: 'varchar', nullable: true })
     lat: number;
 
-    @Column()
+    @Column({ type: 'varchar', nullable: true })
     lng: number;
 
     @Column()
     url: string;
 
-    @Column()
+    @Column({ type: 'varchar', nullable: true })
     avgHappinessRate: number;
 
-    // @ManyToOne(type => AnalysisGroup, analysisGroup => analysisGroup.id)
-    @Column('int')
-    analysisGrpId: AnalysisGroup;
+    @ManyToOne(type => Analysis, analysis => analysis.imageList, {onDelete: 'CASCADE'})
+    analysis: Analysis;
 
     @CreateDateColumn()
     regDate;

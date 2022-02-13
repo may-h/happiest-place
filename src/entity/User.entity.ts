@@ -1,7 +1,7 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
+import {Analysis} from "./Analysis.entity";
 
 @Entity()
-@Unique(['nickname'])
 export class User extends BaseEntity{
     @PrimaryGeneratedColumn()
     id: number;
@@ -11,6 +11,9 @@ export class User extends BaseEntity{
 
     @CreateDateColumn()
     regDate: Date;
+
+    @OneToMany(() => Analysis, analysis =>  analysis.user)
+    analysisList: Analysis[]
 
     @Column({default: true})
     isActive: boolean;
