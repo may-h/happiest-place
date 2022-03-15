@@ -1,0 +1,628 @@
+openapi: 3.0.0
+info:
+  description: This is Haapiest Place API service.
+  version: 1.0.0
+  title: Happiest Place - May's Toy Project
+  contact:
+    email: mayhan9210@gmail.com
+servers:
+  - url: 'https://happiest-places.herokuapp.com'
+tags:
+  - name: image
+    description: Methods to access and manage image
+  - name: analysis
+    description: Methods to access and manage group
+  - name: emotion
+    description: Methods to analyze face emotion from image
+  - name: auth
+    description: Methods to handle authentication
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Signs up a user to the Happiest-place service
+      description: Creates a user account for the given user details
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthApiResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+  /auth:
+    get:
+      tags:
+        - auth
+      summary: Get all user list
+      description: Get all user accounts
+      operationId: getUsers
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+    put:
+      tags:
+        - auth
+      summary: Update user
+      description: Update a user detail
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+  /auth/{id}:
+    get:
+      tags:
+        - auth
+      summary: Find user by ID
+      description: Returns a single user
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to return"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+    delete:
+      tags:
+        - auth
+      summary: Delete user by ID
+      description: Delete a user by ID
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: "ID of user to return"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: Succeeded
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+  /image:
+    get:
+      tags:
+        - image
+      summary: Get all images optionally filtered by analysis group id
+      description: >
+        Fetches a list of image. If analysis group ID is provided, the list contains
+        only images by the given analysis group ID.
+      operationId: getTweets
+      parameters:
+        - name: analysisId
+          in: query
+          description: analysis group id to filter the results
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+      security:
+        - jwt_auth: []
+    put:
+      tags:
+        - image
+      summary: Update image
+      description: Update an image detail
+      operationId: updateImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUpdate'
+        required: true
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+        '403':
+          description: Not Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorizationErrorApiResponse'
+    post:
+      tags:
+        - image
+      summary: Create an image detail
+      description: Create an image detail
+      operationId: createImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageRegistration'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+        '409':
+          description: Image already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorApiResponse'
+  /image/{id}:
+    get:
+      tags:
+        - image
+      summary: Get the image detail by ID
+      description: Get the image detail by ID
+      operationId: getImageById
+      parameters:
+        - name: id
+          in: path
+          description: "ID of image to return"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+    delete:
+      tags:
+        - image
+      summary: Delete image by ID
+      description: Delete a image by ID
+      parameters:
+        - name: id
+          in: path
+          description: "ID of image to delete"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: Succeeded
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+  /analysis:
+    get:
+      tags:
+        - analysis
+      summary: Get all analysis list
+      description: Fetches a list of analysis.
+      operationId: getAnalyses
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisApiResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorizationErrorApiResponse'
+        '403':
+          description: Not Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAuthorizationErrorApiResponse'
+      security:
+        - jwt_auth: []
+  /analysis/{id}:
+    get:
+      tags:
+        - analysis
+      summary: Get the analysis detail with images by ID
+      description: Get the analysis detail with images by ID
+      operationId: getAnalysisById
+      parameters:
+        - name: id
+          in: path
+          description: "ID of analysis to return"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisDetailApiResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+    delete:
+      tags:
+        - analysis
+      summary: Delete image by ID
+      description: Delete a image by ID
+      parameters:
+        - name: id
+          in: path
+          description: "ID of image to delete"
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: Succeeded
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundErrorApiResponse'
+
+components:
+  schemas:
+    UserRegistration:
+      type: object
+      title: User registration details
+      properties:
+        nickname:
+          type: string
+        password:
+          type: string
+          minLength: 5
+      required:
+        - nickname
+        - password
+      example:
+        nickname: may
+        password: password
+    User:
+      type: object
+      title: User detail
+      properties:
+        id:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2021-01-30T08:30:20.000Z'
+        nickname:
+          type: string
+        password:
+          type: string
+          minLength: 5
+    ImageRegistration:
+      type: object
+      title: Image create details
+      properties:
+        userId:
+          type: integer
+          format: int64
+        lat:
+          type: string
+          nullable: true
+        lng:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: url
+          nullable: true
+        avgHappinessRate:
+          type: integer
+          format: int64
+          nullable: true
+        analysisId:
+          type: integer
+          format: int64
+      example:
+        filename: 4220210130083020000LasVegas.jpg
+        orgFilename: LasVegas.jpg
+        lat: -25.344
+        lng: 131.036
+        userId: 1
+        url: http://localhost:8080/uploads/4220210130083020000LasVegas.jpg
+        avgHappinessRate: 0.81
+        analysisId: 1
+    ImageUpdate:
+      type: object
+      title: Image update details
+      properties:
+        filename:
+          type: string
+        orgFilename:
+          type: string
+        lat:
+          type: string
+          nullable: true
+        lng:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+          format: int64
+        url:
+          type: string
+          format: url
+        avgHappinessRate:
+          type: integer
+          format: int64
+          nullable: true
+        analysisId:
+          type: integer
+          format: int64
+      required:
+        - filename
+        - orgFilename
+        - userId
+        - analysisId
+        - url
+      example:
+        id: 42
+        lat: -25.344
+        lng: 131.036
+        url: http://localhost:8080/uploads/4220210130083020000LasVegas.jpg
+        avgHappinessRate: 0.81
+        analysisId: 1
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        filename:
+          type: string
+        orgFilename:
+          type: string
+        lat:
+          type: string
+          nullable: true
+        lng:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+          format: int64
+        regDate:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2021-01-30T08:30:20.000Z'
+        url:
+          type: string
+          format: url
+        avgHappinessRate:
+          type: integer
+          format: int64
+        analysisId:
+          type: integer
+          format: int64
+      required:
+        - id
+        - userId
+        - analysisId
+        - url
+      example:
+        id: 42
+        filename: 4220210130083020000LasVegas.jpg
+        orgFilename: LasVegas.jpg
+        lat: -25.344
+        lng: 131.036
+        userId: 1
+        url: http://localhost:8080/uploads/4220210130083020000LasVegas.jpg
+        avgHappinessRate: 0.81
+        analysisId: 1
+        regDate: '2021-01-30T08:30:20.000Z'
+    AuthApiResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        nickname:
+          type: string
+      required:
+        - token
+        - nickname
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        nickname: may
+    Analysis:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        userId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2021-01-30T08:30:20.000Z'
+        memo:
+          type: string
+          nullable: true
+          example: travel in 2019
+    AnalysisDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        userId:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date
+          example: '2021-01-30T08:30:20.000Z'
+        memo:
+          type: string
+          nullable: true
+          example: travel in 2019
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+    ErrorApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      example:
+        message: "Bad Request"
+    NotFoundErrorApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      example:
+        message: "Not Found"
+    NotAuthorizationErrorApiResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      example:
+        message: "Not Authorization"
+    AnalysisApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Analysis'
+    AnalysisDetailApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnalysisDetail'
+    UsersApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    ImageApiResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Image'
+  securitySchemes:
+    jwt_auth:
+      description: Bearer token authorization with JWT
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

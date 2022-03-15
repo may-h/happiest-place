@@ -1,20 +1,34 @@
-import {BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique} from "typeorm";
-import {Analysis} from "./Analysis.entity";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { Analysis } from './Analysis.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
-export class User extends BaseEntity{
-    @PrimaryGeneratedColumn()
-    id: number;
+export class User extends BaseEntity {
+  @ApiProperty()
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    nickname: string;
+  @ApiProperty()
+  @Column()
+  nickname: string;
 
-    @CreateDateColumn()
-    regDate: Date;
+  @ApiProperty()
+  @CreateDateColumn()
+  regDate: Date;
 
-    @OneToMany(() => Analysis, analysis =>  analysis.user)
-    analysisList: Analysis[]
+  @ApiProperty()
+  @OneToMany(() => Analysis, (analysis) => analysis.user)
+  analysisList: Analysis[];
 
-    @Column({default: true})
-    isActive: boolean;
+  @ApiProperty()
+  @Column({ default: true })
+  isActive: boolean;
 }

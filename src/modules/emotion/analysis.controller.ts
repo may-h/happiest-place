@@ -1,26 +1,25 @@
-import {Body, Controller, Get, Param, Post} from "@nestjs/common";
-import {AnalysisService} from "./analysis.service";
-import {CreateAnalysisDto} from "./dto/create-analysis.dto";
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { AnalysisService } from './analysis.service';
+import { CreateAnalysisDto } from './dto/create-analysis.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('analysis')
+@ApiTags('analysis')
 export class AnalysisController {
+  constructor(private readonly analysisService: AnalysisService) {}
 
-    constructor(private readonly analysisService: AnalysisService) {}
+  @Get()
+  findAll() {
+    return this.analysisService.findAll();
+  }
 
-    @Get()
-    findAll() {
-        return this.analysisService.findAll();
-    }
+  @Get(':id')
+  findById(@Param('id') id: number) {
+    return this.analysisService.findById(id);
+  }
 
-    @Get(':id')
-    findById(@Param('id') id: number) {
-        return this.analysisService.findById(id);
-    }
-
-
-    @Post()
-    create(@Body() createAnalysisDto: CreateAnalysisDto) {
-        return this.analysisService.create(createAnalysisDto);
-    }
-
+  @Post()
+  create(@Body() createAnalysisDto: CreateAnalysisDto) {
+    return this.analysisService.create(createAnalysisDto);
+  }
 }

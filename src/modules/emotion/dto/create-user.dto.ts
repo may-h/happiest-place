@@ -1,4 +1,11 @@
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+
 export class CreateUserDto {
-    readonly id: string;
-    readonly nickname: string;
+  @ApiProperty({ example: 1 })
+  readonly id: string;
+
+  @ApiProperty({ example: 'may' })
+  readonly nickname: string;
 }
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {}
