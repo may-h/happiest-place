@@ -13,13 +13,22 @@
     console.log(key)
 </script>
 
-<form method="post" action="/emotion" enctype="multipart/form-data">
+<form method="post" action="/api/analyzeEmotion" enctype="multipart/form-data">
     <div>
         <!--        file : <input type="file" name="file" id="file" accept="image/*" onChange="getGps();" >-->
+        User ID : <input type="text" name="userId">
         <br> <input type="file" multiple="multiple" data-maxfile="1024" maxlength="5" name="files" id="files" accept="image/*" >
     </div>
     <input type="submit">
 </form>
+<br><br>
+
+
+<form method="get" action="/api/analysis">
+    Analysis ID : <input type="text" name="analysisId">
+    <input type="submit" value="검색">
+</form>
+
 
 <form method="post" action="/emotion/test" enctype="multipart/form-data">
     <input type="submit" value="Demo">

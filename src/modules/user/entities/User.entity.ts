@@ -7,8 +7,9 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Analysis } from './Analysis.entity';
+import { Analysis } from '../../analysis/entities/Analysis.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, MinLength } from 'class-validator';
 
 @Entity()
 export class User extends BaseEntity {
@@ -20,12 +21,15 @@ export class User extends BaseEntity {
   @Column()
   nickname: string;
 
+  @Column()
+  password: string;
+
   @ApiProperty()
   @CreateDateColumn()
   regDate: Date;
 
   @ApiProperty()
-  @OneToMany(() => Analysis, (analysis) => analysis.user)
+  @OneToMany(() => Analysis, (analysis) => analysis.user, { cascade: true })
   analysisList: Analysis[];
 
   @ApiProperty()

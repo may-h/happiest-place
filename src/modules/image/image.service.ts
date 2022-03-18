@@ -23,7 +23,7 @@ export class ImageService {
   }
 
   async getAllImageByAnalysisId(analysisId: number) {
-    return await this.imageRepository.find({ where: { analysis: analysisId } });
+    return await this.imageRepository.find({ where: { analysisId } });
   }
 
   async getImageById(id: number) {
@@ -31,7 +31,7 @@ export class ImageService {
   }
 
   async deleteImageById(id: number) {
-    await this.imageRepository.delete(id);
+    return await this.imageRepository.delete(id);
   }
 
   async updateImage(id: number, updatedData: UpdateImageDto) {

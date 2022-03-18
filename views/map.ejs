@@ -36,7 +36,7 @@
     }
 </style>
 <body>
-<script async src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.MAP_KEY %>"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBSAMsNZweI-C7zl0yDiAwroebVp9Xl-Hs&callback=initMap"></script>
 <div id="map"></div>
 <!--<div id="content">Hello world!</div>-->
 <div id="gpsEmpthy">
@@ -66,8 +66,8 @@
         }
 
         photos.forEach((photo, idx) => {
-            if(photo.gps.lat && photo.gps.lng) { // gps 값이 없으면 skip
-                const position = { lat: Number(photo.gps.lat), lng: Number(photo.gps.lng) };
+            if(photo.lat && photo.lng) { // gps 값이 없으면 skip
+                const position = { lat: Number(photo.lat), lng: Number(photo.lng) };
                 // The marker, positioned at Uluru
                 const marker = new google.maps.Marker({
                     position,
@@ -75,7 +75,7 @@
                 });
 
                 let infowindow = new google.maps.InfoWindow({
-                    content: getContentString(photo.url, photo.happiness, idx + 1),
+                    content: getContentString(photo.url, photo.avgHappinessRate, idx + 1),
                     position
                 });
 
@@ -91,7 +91,7 @@
                 div.classList.add('overlaybox');
                 div.innerHTML = `<div class="first" style="background-image: url('${photo.url}'); background-size: cover; background-repeat: no-repeat; background-position: center center;  ">
                             <div class="triangle text">${idx+1}</div>
-                            <div class="movietitle text">🌟행복지수 ${photo.happiness}🌟</div>
+                            <div class="movietitle text">🌟행복지수 ${photo.avgHappinessRate}🌟</div>
                         </div>`;
 
                 list.appendChild(div);

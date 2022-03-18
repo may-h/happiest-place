@@ -1,5 +1,4 @@
-import { Analysis } from '../../../entity/Analysis.entity';
-import { IsString } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateImageDto {
   @IsString()
@@ -12,6 +11,9 @@ export class CreateImageDto {
   lng: any;
   @IsString()
   url: string;
+  @IsOptional()
   @IsString()
-  avgHappinessRate: any;
+  analysisId: number;
+  @IsNumber()
+  avgHappinessRate: number;
 }

@@ -7,9 +7,14 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Analysis } from '../../../entity/Analysis.entity';
+import { Analysis } from '../../analysis/entities/Analysis.entity';
 
-@Entity()
+@Entity({
+  orderBy: {
+    avgHappinessRate: 'DESC',
+    id: 'ASC',
+  },
+})
 export class Image extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -29,13 +34,16 @@ export class Image extends BaseEntity {
   @Column()
   url: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'real', nullable: true })
   avgHappinessRate: number;
 
   @Column({ nullable: true })
   analysisId: number;
 
-  @ManyToOne((type) => Analysis, (analysis) => analysis.imageList, { onDelete: 'CASCADE' })
+  @ManyToOne((type) => Analysis, (analysis) => analysis.imageList, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   analysis: Analysis;
 
   @CreateDateColumn()

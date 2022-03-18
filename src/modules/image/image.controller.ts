@@ -29,6 +29,7 @@ export class ImageController {
 
   @Get()
   async getImages(@Query('analysisId') analysisId?: number) {
+    console.log(`analysis id -> ${analysisId}`);
     return analysisId
       ? await this.imageService.getAllImageByAnalysisId(analysisId)
       : await this.imageService.getAllImages();

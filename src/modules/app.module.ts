@@ -4,11 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config';
 import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { EmotionModule } from './emotion/emotion.module';
-import { UserModule } from './emotion/user.module';
+import { UserModule } from './user/user.module';
 import { AnalysisModule } from './analysis/analysis.module';
 import { ConfigService } from './config';
 import { ImageModule } from './image/image.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { ImageModule } from './image/image.module';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
           entities: [__dirname + '/../**/*.entity.{js,ts}'],
-          synchronize: configService.get('DB_SYNC') === 'true',
+          synchronize: true, //configService.get('DB_SYNC') === 'true',
           ssl: {
             require: true,
             rejectUnauthorized: false,
@@ -33,13 +33,13 @@ import { ImageModule } from './image/image.module';
       },
     }),
     ConfigModule,
-    // EmotionModule,
-    // UserModule,
-    // AnalysisModule,
+    UserModule,
+    AnalysisModule,
     ImageModule,
+    AuthModule,
   ],
-  // controllers: [AppController],
-  // providers: [AppService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {
   constructor(private connection: Connection) {}
