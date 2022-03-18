@@ -16,8 +16,14 @@ export class AnalysisService {
     return this.analysisRepository.find({ order: { regDate: 'DESC' } });
   }
 
-  async getAllAnalysesByUserId(id: number) {
-    return this.analysisRepository.find({ where: { userId: id } });
+  async getAllAnalysesByUserId(userId: number) {
+    // return this.analysisRepository.find({ where: { userId: id } });
+    return await this.analysisRepository
+      .createQueryBuilder('analysis')
+      .leftJoinAndSelect('analysis.imageList', 'image')
+      .where('analysis.userId = :userId', { userId })
+      .orderBy('image.avgHappinessRate', 'DESC', 'NULLS LAST')
+      .getMany();
   }
 
   async getAnalysisById(id: number) {
@@ -25,12 +31,13 @@ export class AnalysisService {
       .createQueryBuilder('analysis')
       .leftJoinAndSelect('analysis.imageList', 'image')
       .where('analysis.id = :id', { id })
-      .orderBy('image.avgHappinessRate', 'DESC')
+      .orderBy('image.avgHappinessRate', 'DESC', 'NULLS LAST')
       .getOne();
   }
 
   async createAnalysis(dto: CreateAnalysisDto) {
     // TODO: User Id Check
+    console.log(dto);
     const analysis = this.analysisRepository.create(dto);
     console.log(analysis);
     return await this.analysisRepository.save(analysis);

@@ -7,7 +7,9 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Redirect,
   Render,
+  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -17,10 +19,8 @@ import { AnalysisService } from './analysis/analysis.service';
 import { GenerateFilenamePipe } from './generate-filename.pipe';
 import { extractExifPipe } from './extract-exif.pipe';
 import { AppService } from './app.service';
-// import { AppService } from './app.service';
-// import { ConfigService } from '@nestjs/config';
-// import { FilesInterceptor } from '@nestjs/platform-express';
-// import { diskStorage } from 'multer';
+import { AuthService } from './auth/auth.service';
+import { LoginDto } from './auth/dtos/login.dto';
 
 @Controller()
 export class AppController {
@@ -28,6 +28,7 @@ export class AppController {
     private readonly appService: AppService,
     private readonly imageService: ImageService,
     private readonly analysisService: AnalysisService,
+    private readonly authService: AuthService,
   ) {}
 
   @Get()
@@ -36,8 +37,11 @@ export class AppController {
     return { title: 'Happiest Place 🧳' };
   }
 
+  @Get('home')
+  @Render('home')
+  home() {}
+
   @Post('api/analyzeEmotion')
-  @Render('map')
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       fileFilter: (request, file, callback) => {
@@ -69,15 +73,16 @@ export class AppController {
   async runAnalysis(
     @UploadedFiles(GenerateFilenamePipe, extractExifPipe) files: Array<Express.Multer.File>,
     @Body('userId') userId: number,
+    @Body('memo') memo: string,
+    @Res() res,
   ) {
-    const result = [];
+    console.log(memo);
     const { id: analysisId } = await this.analysisService.createAnalysis({
       userId,
-      memo: undefined,
+      memo,
     });
-    for (let file of files) {
-      // 비동기
 
+    for (let file of files) {
       const updatedFile = await Promise.all([
         this.appService.addHappinessRateField(file),
         this.appService.uploadImage(file),
@@ -86,37 +91,27 @@ export class AppController {
         ...values[1],
       }));
 
-      const image = await this.imageService.createImage({
+      await this.imageService.createImage({
         ...updatedFile,
         orgFilename: updatedFile.originalname,
         analysisId,
       });
 
-      result.push(image);
-      //동기
-      // file = await this.appService.addHappinessRateField(file);
-      //
-      // const { filename, originalname, lat, lng, avgHappinessRate, url } =
-      //   await this.appService.uploadImage(file);
-      //
-      // const image = await this.imageService.createImage({
-      //   filename,
-      //   orgFilename: originalname,
-      //   lat,
-      //   lng,
-      //   avgHappinessRate,
-      //   url,
-      //   analysisId,
-      // });
-      // result.push(image);
+      console.log(`analysisId : ${analysisId}`);
+      res.redirect(`/detail?analysisId=${analysisId}`);
     }
-
-    return { data: result };
   }
 
-  @Get('api/analysis')
+  @Get('list')
+  @Render('list')
+  async listPage(@Query('userId', ParseIntPipe) userId: number) {
+    const data = await this.analysisService.getAllAnalysesByUserId(userId);
+    return { data };
+  }
+
+  @Get('detail')
   @Render('map')
-  async getAnalysisById(@Query('analysisId', ParseIntPipe) id: number) {
+  async goDetail(@Query('analysisId', ParseIntPipe) id: number) {
     console.log(id);
     const data = await this.analysisService.getAnalysisById(id);
     return { data: data.imageList };
@@ -128,70 +123,109 @@ export class AppController {
     return {
       data: [
         {
-          id: 4,
-          filename: '8858288267385852-20190921_024320.JPEG',
-          orgFilename: '20190921_024320.JPEG',
-          lat: null,
-          lng: null,
-          url: 'https://happiestplace.blob.core.windows.net/uploads/8858288267385852-20190921_024320.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A23Z&se=2022-03-18T04%3A17%3A23Z&sr=b&sp=r&sig=w6nbJbDiMeut5LjRQVZQoYNWjE%2F3e%2BZuLt6pflancVo%3D',
-          avgHappinessRate: 55.5,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:23.519Z',
+          id: 10,
+          filename: '6016197057766142-2018-08-30-19-59-17-431.jpg',
+          orgFilename: '2018-08-30-19-59-17-431.jpg',
+          lat: '33.45883888888889',
+          lng: '126.83023055555554',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/6016197057766142-2018-08-30-19-59-17-431.jpg',
+          avgHappinessRate: 99.9,
+          analysisId: 1,
+          regDate: '2022-03-17T23:57:49.773Z',
         },
         {
-          id: 5,
-          filename: '13976412403539396-beauty_20190921182054.JPEG',
-          orgFilename: 'beauty_20190921182054.JPEG',
-          lat: '-26.14987',
-          lng: '150.57434',
-          url: 'https://happiestplace.blob.core.windows.net/uploads/13976412403539396-beauty_20190921182054.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A26Z&se=2022-03-18T04%3A17%3A26Z&sr=b&sp=r&sig=eWfzW2768%2BHkApTiQBx6PkPoz8HP9IZ%2FKXMdIpv5xMA%3D',
-          avgHappinessRate: 48.6,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:26.751Z',
+          id: 6,
+          filename: '3107830277883157-P20170624_121130000_AEA6F6D1-46DC-4735-8192-F0CB007968AA.JPG',
+          orgFilename: 'P20170624_121130000_AEA6F6D1-46DC-4735-8192-F0CB007968AA.JPG',
+          lat: '36.60776',
+          lng: '-82.11119',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/3107830277883157-P20170624_121130000_AEA6F6D1-46DC-4735-8192-F0CB007968AA.JPG',
+          avgHappinessRate: 98.2,
+          analysisId: 1,
+          regDate: '2022-03-17T23:56:35.994Z',
+        },
+        {
+          id: 12,
+          filename: '7594003993648453-1539434659190.jpg',
+          orgFilename: '1539434659190.jpg',
+          lat: null,
+          lng: null,
+          url: 'https://happiestplace.blob.core.windows.net/uploads/4682805447866114-2018-12-30-20-00-03-753.jpg',
+          avgHappinessRate: 80.44,
+          analysisId: 1,
+          regDate: '2022-03-17T23:58:03.317Z',
         },
         {
           id: 3,
-          filename: '7029339202913483-beauty_20190921182213.JPEG',
-          orgFilename: 'beauty_20190921182213.JPEG',
+          filename:
+            '07326787146206937-P20170216_103603000_5BFBB3A8-65CA-4EA7-B917-74EE7DBAFECF.JPG',
+          orgFilename: 'P20170216_103603000_5BFBB3A8-65CA-4EA7-B917-74EE7DBAFECF.JPG',
+          lat: '-6.86997',
+          lng: '-75.04585',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/07326787146206937-P20170216_103603000_5BFBB3A8-65CA-4EA7-B917-74EE7DBAFECF.JPG',
+          avgHappinessRate: 68.75,
+          analysisId: 1,
+          regDate: '2022-03-17T23:55:30.728Z',
+        },
+        {
+          id: 1,
+          filename:
+            '33619204608504805-P20161031_112510000_4530EC89-9BBB-4D5D-B5A5-3EAD20D1ED64.JPG',
+          orgFilename: 'P20161031_112510000_4530EC89-9BBB-4D5D-B5A5-3EAD20D1ED64.JPG',
+          lat: '28.54211',
+          lng: '-81.37903',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/33619204608504805-P20161031_112510000_4530EC89-9BBB-4D5D-B5A5-3EAD20D1ED64.JPG',
+          avgHappinessRate: 56.9,
+          analysisId: 1,
+          regDate: '2022-03-17T23:55:26.742Z',
+        },
+        {
+          id: 8,
+          filename:
+            '29347292920666246-P20171224_224753000_F9E0B2AF-B9C3-4C66-9086-83ED6689ADEE.JPG',
+          orgFilename: 'P20171224_224753000_F9E0B2AF-B9C3-4C66-9086-83ED6689ADEE.JPG',
+          lat: '58.91738',
+          lng: '22.91817',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/29347292920666246-P20171224_224753000_F9E0B2AF-B9C3-4C66-9086-83ED6689ADEE.JPG',
+          avgHappinessRate: 53.11,
+          analysisId: 1,
+          regDate: '2022-03-17T23:57:45.554Z',
+        },
+        {
+          id: 13,
+          filename:
+            '21561099691697216-P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
+          orgFilename: 'P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
           lat: null,
           lng: null,
-          url: 'https://happiestplace.blob.core.windows.net/uploads/7029339202913483-beauty_20190921182213.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A17Z&se=2022-03-18T04%3A17%3A17Z&sr=b&sp=r&sig=hyM8AztuUh2CFYKDdvwS6%2BdC%2FIv%2FKuN2ySnLmlVJDRw%3D',
-          avgHappinessRate: 12.45,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:17.903Z',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/19279100414858097-P20180102_145134000_86E593BA-F348-4076-ACAB-97A5948684CF.JPG',
+          avgHappinessRate: 31.1,
+          analysisId: 1,
+          regDate: '2022-03-17T23:55:28.683Z',
         },
         {
-          id: 3,
-          filename: '7029339202913483-beauty_20190921182213.JPEG',
-          orgFilename: 'beauty_20190921182213.JPEG',
+          id: 12,
+          filename:
+            '21561099691697216-P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
+          orgFilename: 'P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
           lat: null,
           lng: null,
-          url: 'https://happiestplace.blob.core.windows.net/uploads/7029339202913483-beauty_20190921182213.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A17Z&se=2022-03-18T04%3A17%3A17Z&sr=b&sp=r&sig=hyM8AztuUh2CFYKDdvwS6%2BdC%2FIv%2FKuN2ySnLmlVJDRw%3D',
-          avgHappinessRate: 12.45,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:17.903Z',
+          url: 'https://happiestplace.blob.core.windows.net/uploads/BandPhoto_2018_08_31_18_40_58.jpg',
+          avgHappinessRate: 79.34,
+          analysisId: 1,
+          regDate: '2022-03-17T23:55:28.683Z',
         },
         {
-          id: 4,
-          filename: '7029339202913483-beauty_20190921182213.JPEG',
-          orgFilename: 'beauty_20190921182213.JPEG',
-          lat: '34.63351',
-          lng: '117.63439',
-          url: 'https://happiestplace.blob.core.windows.net/uploads/7029339202913483-beauty_20190921182213.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A17Z&se=2022-03-18T04%3A17%3A17Z&sr=b&sp=r&sig=hyM8AztuUh2CFYKDdvwS6%2BdC%2FIv%2FKuN2ySnLmlVJDRw%3D',
-          avgHappinessRate: 10.1,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:17.903Z',
-        },
-        {
-          id: 5,
-          filename: '7029339202913483-beauty_20190921182213.JPEG',
-          orgFilename: 'beauty_20190921182213.JPEG',
-          lat: '21.15589',
-          lng: '79.12638',
-          url: 'https://happiestplace.blob.core.windows.net/uploads/7029339202913483-beauty_20190921182213.JPEG?sv=2020-10-02&st=2022-03-18T03%3A17%3A17Z&se=2022-03-18T04%3A17%3A17Z&sr=b&sp=r&sig=hyM8AztuUh2CFYKDdvwS6%2BdC%2FIv%2FKuN2ySnLmlVJDRw%3D',
+          id: 11,
+          filename:
+            '21561099691697216-P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
+          orgFilename: 'P20170202_113846000_E413E34F-5F3E-4E56-94C7-36DDE0F57601.JPG',
+          lat: null,
+          lng: null,
+          url: 'https://happiestplace.blob.core.windows.net/uploads/P20170315_190555000_445B4146-B597-4935-99A6-8667078AC146.JPG',
           avgHappinessRate: null,
-          analysisId: 6,
-          regDate: '2022-03-17T18:17:17.903Z',
+          analysisId: 44.56,
+          regDate: '2022-03-17T23:55:28.683Z',
         },
       ],
     };
