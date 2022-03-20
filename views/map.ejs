@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('header') %>
+<style>
+    #map {
+        height: 50%;
+    }
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .overlaybox {position:relative;width:200px;height:150px; background-color: antiquewhite}
+    .overlaybox div, ul {overflow:hidden;margin:0;padding:0;}
+    .overlaybox li {list-style: none;}
+    .overlaybox .first {position:relative;width:100%;height:100%;margin-bottom:8px;}
+    .first .text {color:#fff;font-weight:bold;}
+    .first .triangle {position:absolute;width:48px;height:48px;top:0;left:0;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/triangle.png') no-repeat; padding:6px;font-size:18px;}
+    .first .movietitle {position:absolute;width:100%;bottom:0;background:rgba(0,0,0,0.4);padding:7px 15px;font-size:14px;}
+    .triangle {position:absolute;width:48px;height:48px;top:0;left:0;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/triangle.png') no-repeat; padding:6px;font-size:18px;}
+    .text {color:#fff;font-weight:bold;}
+</style>
+<body>
+    `<script async src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.MAP_KEY %>"></script>
+
+    <%- include('navigation') %>
+
+    <div id="map" class="container-fluid shadow p-3 mb-3 bg-body"></div>
+
+    <button class="btn btn-danger position-absolute top-50 end-0 shadow-lg p-3 mb-5 rounded" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">See Top Ranks</button>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h4 id="offcanvasRightLabel"> 🛩 🛳 당신이 행복했던 장소입니다.</h4>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" id="topRanksList">
+        </div>
+    </div>
+
+    <div id="failList" class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 invisible" id="failGpsDiv">
+                <h3> 📍위치를 찾을 수 없어요 </h3>
+                <div class="row row-cols-4 gap-3" id="failGpsList">
+                </div>
+            </div>
+            <div class="col-6 col-md-4 invisible" id="failEmotionDiv">
+                <h3> 😢 표정 분석에 실패했어요 </h3>
+                <div class="row row-cols-4 gap-3" id="failEmotionList">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="inputGpsModal" tabindex="-1" aria-labelledby="inputGpsModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputGpsModal"> 📍 GPS 위치를 입력해주세요 </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3 visually-hidden">
+                            <input class="form-control" name='imageId' id="imageId">
+                        </div>
+                        <div class="mb-3">
+                            <label for="latitude" class="col-form-label">Latitude:</label>
+                            <input type="text" class="form-control" id="latitude">
+                        </div>
+                        <div class="mb-3">
+                            <label for="longitude" class="col-form-label">Longitude:</label>
+                            <input class="form-control" id="longitude">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary">저장 💾 </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="inputEmotionModal" tabindex="-1" aria-labelledby="inputEmotionModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inputGpsModal"> ❤️ 행복 지수를 입력해주세요 </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3 visually-hidden">
+                            <input class="form-control" name='imageId' id="imageId">
+                        </div>
+                        <div class="mb-3" >
+                            <label for="happiness" class="col-form-label"> 행복지수: </label>
+                            <input type="text" class="d-inline form-control w-75" id="happiness"> %
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary">저장 💾 </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        // Initialize and add the map
+        let map, popup, Popup;
+        var photos = <%- JSON.stringify(data) %>
+            console.log(photos);
+
+        function generateMapContentHTML(url, happiness, rank) {
+            return `<div class="overlaybox">
+                     <div class="first" style="background-image: url('${url}'); background-size: cover; background-repeat: no-repeat; background-position: center center;  ">
+                        <div class="triangle text">${rank}</div>
+                        <div class="movietitle text">  ❤️ 행복지수 ${happiness}%️ </div>
+                       </div>
+                </div>`
+        }
+
+        function generateGPSFailContentHTML(url, happiness, rank, imageId) {
+            return `<div class="triangle text">${rank}</div>
+                    <img style='height: 150px; width: 100%; object-fit: cover' src="${url}" class="card-img-top " alt="image">
+                    <div class="card-body">
+                        <h5 class="card-title"> ❤️ 행복지수 ${happiness}%️</h5>
+                        <p class="card-text"> 위치를 찾을 수 없어요😢 <br> 직접 입력해주세요! </p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputGpsModal" data-bs-imageId="${imageId}">📍 위치 입력 </button>
+                    </div>`
+        }
+
+        function generateEmotionFailContentHTML(url, imageId) {
+            return `<img style='height: 150px; width: 100%; object-fit: cover' src="${url}" class="card-img-top " alt="image">
+                    <div class="card-body">
+                        <h5 class="card-title"> ❓ 행복지수 ❓  </h5>
+                        <p class="card-text"> 표정 분석에 실패했어요. <br> 직접 입력해주세요! </p>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inputEmotionModal" data-bs-imageId="${imageId}"> ❤️ 지수 입력 </button>
+                        <button type="button" class="btn btn-secondary">삭제</button>
+                    </div>`
+        }
+
+        function generateImageContentHTML(url, happiness, rank, imageId) {
+            return `<div class="triangle text">${rank}</div>
+                    <img style='height: 180px; width: 100%; object-fit: cover' src="${url}" class="card-img-top " alt="image">
+                    <div class="card-body">
+                        <h5 class="card-title"> ❤️ 행복지수 ${happiness}%️</h5>
+                    </div>`
+        }
+
+        function initMap() {
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 2,
+                center: {
+                    lat: Number(photos[0]?.lat) || -25.344,
+                    lng: Number(photos[0]?.lng) ||  131.036
+                },
+            });
+
+            photos.forEach((photo, idx) => {
+                if(photo.avgHappinessRate != null) { // top ranks list
+                    const topRankslist = document.querySelector('#topRanksList');
+                    let div = document.createElement('div');
+                    div.classList.add('col-sm-8', 'card', 'shadow-sm', 'p-3', 'mb-5', 'bg-body', 'rounded');
+                    div.style.width = '21rem';
+                    div.innerHTML = generateImageContentHTML(photo.url, photo.avgHappinessRate, idx + 1, photo.id)
+                    topRankslist.appendChild(div);
+                }
+
+                if(photo.avgHappinessRate == null) { // 표정 분석 실패
+                    document.getElementById('failEmotionDiv').classList.remove('invisible');
+                    const list = document.querySelector('#failEmotionList');
+                    let div = document.createElement('div');
+                    div.classList.add('col-sm-8', 'card', 'shadow-sm', 'p-3', 'mb-5', 'bg-body', 'rounded');
+                    div.style.width = '16rem';
+                    div.innerHTML = generateEmotionFailContentHTML(photo.url, photo.id);
+                    list.appendChild(div);
+                } else if (!(photo.lat && photo.lng)) { // GPS 추출 실패
+                    document.getElementById('failGpsDiv').classList.remove('invisible');
+
+                    const list = document.querySelector('#failGpsList');
+                    let div = document.createElement('div');
+                    div.classList.add('col-sm-8', 'card', 'shadow-sm', 'p-3', 'mb-5', 'bg-body', 'rounded');
+                    div.style.width = '16rem';
+                    div.innerHTML = generateGPSFailContentHTML(photo.url, photo.avgHappinessRate, idx + 1, photo.id)
+                    list.appendChild(div);
+                } else {
+                    const position = { lat: Number(photo.lat), lng: Number(photo.lng) };
+                    // The marker, positioned at Uluru
+                    const marker = new google.maps.Marker({
+                        position,
+                        map: map,
+                    });
+
+                    let infowindow = new google.maps.InfoWindow({
+                        content: generateMapContentHTML(photo.url, photo.avgHappinessRate, idx + 1),
+                        position
+                    });
+
+                    // infowindow
+                    infowindow.open({
+                        anchor: marker,
+                        map,
+                        shouldFocus: false,
+                    });
+                }
+            })
+        }
+
+
+        // <!-- Input Modal -->
+        const inputGpsModal = document.getElementById('inputGpsModal')
+        inputGpsModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget
+            const imageId = button.getAttribute('data-bs-imageId')
+            const modalImageIdInput = inputGpsModal.querySelector('.modal-body input')
+            modalImageIdInput.value = imageId;
+        })
+
+        const inputEmotionModal = document.getElementById('inputEmotionModal')
+        inputEmotionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget
+            const imageId = button.getAttribute('data-bs-imageId')
+            const modalImageIdInput = inputEmotionModal.querySelector('.modal-body input')
+            modalImageIdInput.value = imageId;
+        })
+        // <!--  END:  Input Modal -->
+    </script>
+</body>
+</html>

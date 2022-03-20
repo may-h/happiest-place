@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<%- include('header') %>
+<body>
+<header>
+    <%- include('navigation') %>
+</header>
+
+<div class="container-fluid m-5">
+    <figure>
+        <blockquote class="blockquote">
+            <h5>Adventure Is Worthwhile</h5>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+            모험은 가치 있는 것이다. <cite title="Source Title"> May </cite>
+        </figcaption>
+    </figure>
+    <div class="row row-cols-4 gap-4">
+    <% for (let analysis of data) { %>
+        <div class="card shadow p-3 bg-body rounded" style="width: 25rem;">
+            <button type="button" class="btn-close position-absolute top-0 end-0" aria-label="Close"></button>
+            <img  style='height: 250px; width: 100%; object-fit: cover' src="<%=analysis.imageList[0].url%>" class="card-img-top mt-4 img-thumbnail " alt="<%= analysis.id %>">
+            <div class="card-body">
+                <p class="card-text"><%= analysis.memo %></p>
+                <p class="card-text"><small class="text-muted">Created at <%= new Date(analysis.regDate).toDateString()%> </small></p>
+                <a href="/detail?analysisId=<%=analysis.id%>" class="btn btn-primary">See</a>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+
+<script>
+    // Initialize and add the map
+    let map, popup, Popup;
+    var photos = <%- JSON.stringify(data) %>
+        console.log(photos);
+
+
+</script>
+
+</body>
+</html>

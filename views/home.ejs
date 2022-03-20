@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<%- include('header') %>
+
+<body>
+    <div class="container position-absolute top-50 start-50 translate-middle w-50">
+        <div class="row">
+            <div class="card border-0" style="width: 50%; text-align: center" data-bs-toggle="modal" data-bs-target="#exampleModal" id="analysisCard">
+                <div style="display: inline-block; text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="75%" height="75%" fill="#6155A6" class="bi bi-clipboard-data-fill" viewBox="0 0 16 16">
+                        <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1ZM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0V8Zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0v-1Zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1Z"/>
+                    </svg>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title" style="color: #252525; font-family: 'Jua', sans-serif;">여행 사진 분석하기</h2>
+                </div>
+            </div>
+            <div class="card border-0" style="width: 50%; text-align: center" id="listCard" onclick="location.href='/list?userId=1'">
+                <div style="display: inline-block; text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="75%" height="75%" fill="#6155A6  " class="bi bi-card-list" viewBox="0 0 16 16">
+                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                        <path d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8zm0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zM4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                    </svg>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title" style="color: #252525; text-align: center; font-family: 'Jua', sans-serif;">분석 리스트 보기</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="/api/analyzeEmotion" enctype="multipart/form-data" id="fileForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"> 🧳 여행 사진은 첨부해주세요 </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label"> 📸 Photos: </label>
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" type="file" multiple="multiple" data-maxfile="1024" maxlength="5" name="files" id="files" accept="image/*" >
+                                <label class="input-group-text" for="files">Upload</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="memo" class="col-form-label"> 📃 Memo:</label>
+                            <textarea class="form-control" id="memo" name="memo"></textarea>
+                        </div>
+                        <div class="mb-3 visually-hidden">
+                            <input class="form-control" name='userId' id="userId" value="1">
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">분석하기</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
