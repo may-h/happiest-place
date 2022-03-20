@@ -7,7 +7,9 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Req,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -15,6 +17,9 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dtos/create-user.dto';
 import { LoginDto } from './dtos/login.dto';
 import { log } from 'util';
+import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './local-auth.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -35,11 +40,16 @@ export class AuthController {
     return user;
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    const { nickname, password } = loginDto;
-    // TODO: return with createdJWTToken
-    return await this.authService.validateUser(nickname, password);
+  async login(@Req() req) {
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@Req() req) {
+    return req.user;
   }
 
   @Delete(':id')

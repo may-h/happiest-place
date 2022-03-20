@@ -24,7 +24,7 @@ import { AuthModule } from './auth/auth.module';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
           entities: [__dirname + '/../**/*.entity.{js,ts}'],
-          synchronize: true, //configService.get('DB_SYNC') === 'true',
+          synchronize: false, //configService.get('DB_SYNC') === 'true',
           ssl: {
             require: true,
             rejectUnauthorized: false,

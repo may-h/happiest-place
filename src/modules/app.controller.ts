@@ -9,8 +9,10 @@ import {
   Query,
   Redirect,
   Render,
+  Req,
   Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -21,6 +23,7 @@ import { extractExifPipe } from './extract-exif.pipe';
 import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { LoginDto } from './auth/dtos/login.dto';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -37,9 +40,12 @@ export class AppController {
     return { title: 'Happiest Place 🧳' };
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Get('home')
   @Render('home')
-  home() {}
+  home(@Req() req, @Query('token') token: string) {
+    return { token, ...req.user };
+  }
 
   @Post('api/analyzeEmotion')
   @UseInterceptors(
@@ -76,7 +82,6 @@ export class AppController {
     @Body('memo') memo: string,
     @Res() res,
   ) {
-    console.log(memo);
     const { id: analysisId } = await this.analysisService.createAnalysis({
       userId,
       memo,
@@ -112,12 +117,11 @@ export class AppController {
   @Get('detail')
   @Render('map')
   async goDetail(@Query('analysisId', ParseIntPipe) id: number) {
-    console.log(id);
     const data = await this.analysisService.getAnalysisById(id);
     return { data: data.imageList };
   }
 
-  @Get('test')
+  @Get('demo')
   @Render('map')
   async testPage() {
     return {

@@ -87,13 +87,14 @@ export class AppService {
       permissions: BlobSASPermissions.parse('r'),
     };
 
-    const sasToken = generateBlobSASQueryParameters(
-      sasOptions,
-      this.sharedKeyCredential,
-    ).toString();
+    // const sasToken = generateBlobSASQueryParameters(
+    //   sasOptions,
+    //   this.sharedKeyCredential,
+    // ).toString();
     // console.log(`SAS token for blob is: ${sasToken}`);
 
-    return `${this.BLOB_CONTAINER_CLIENT.getBlockBlobClient(blobName).url}?${sasToken}`;
+    // return `${this.BLOB_CONTAINER_CLIENT.getBlockBlobClient(blobName).url}?${sasToken}`;
+    return `${this.BLOB_CONTAINER_CLIENT.getBlockBlobClient(blobName).url}`;
   }
 
   async uploadImage(file) {
