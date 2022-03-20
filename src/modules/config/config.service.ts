@@ -1,19 +1,13 @@
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
-import { DotenvParseOutput } from 'dotenv';
+import { Injectable } from '@nestjs/common';
 
 export class ConfigService {
-  private readonly envConfig: DotenvParseOutput;
-  private result;
-
   constructor() {
-    this.result = dotenv.config();
-    this.envConfig = this.result.parsed;
+    // dotenv.config();
   }
 
   get(key: string): string {
-    console.log(this.result);
-    console.log(this.envConfig);
-    return this.envConfig[key];
+    return process.env[key];
   }
 }
