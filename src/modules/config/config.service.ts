@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
+import { DotenvParseOutput } from 'dotenv';
 
 export class ConfigService {
-  private readonly envConfig: { [key: string]: string };
+  private readonly envConfig: DotenvParseOutput;
 
   constructor() {
-    // this.envConfig = dotenv.parse(fs.readFileSync(filePath));
     this.envConfig = dotenv.config().parsed;
   }
 
