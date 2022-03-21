@@ -31,8 +31,7 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() dto: CreateUserDto) {
-    console.log(dto);
-    const user = await this.userService.createUser(dto);
+    const user = await this.authService.signup(dto);
     if (user) {
       // TODO - auth token
       // const token = await this.authService.createToken(user);

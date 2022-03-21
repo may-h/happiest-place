@@ -1,23 +1,32 @@
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  LoggerService,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './entities/User.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { ConfigService } from '../config';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
+  private readonly logger: Logger = new Logger(UserService.name);
+
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(User)
     private userRepository: Repository<User>, // DB와의 연결 정의
   ) {}
 
   async createUser(userDto: CreateUserDto) {
-    let existUser = await this.getUserByNickname(userDto.nickname);
-    if (existUser) {
-      throw new NotAcceptableException('User with provided nickname already exist');
-    }
     const { password, ...rest } = await this.userRepository.save(userDto);
+    this.logger.log(`Created User id [${rest.id}], nickname [${rest.nickname}]`);
     return rest;
   }
 

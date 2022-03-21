@@ -5,4 +5,7 @@ export class CreateUserDto {
   @ApiProperty({ example: 'may' })
   @IsString()
   readonly nickname: string;
+
+  @IsString()
+  password: string;
 }

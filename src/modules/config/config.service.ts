@@ -1,6 +1,4 @@
-import * as fs from 'fs';
 import * as dotenv from 'dotenv';
-import { Injectable } from '@nestjs/common';
 
 export class ConfigService {
   constructor() {
@@ -8,8 +6,6 @@ export class ConfigService {
   }
 
   get(key: string): string {
-    console.log(key);
-    console.log(process.env[key]);
     return process.env[key];
   }
 }
